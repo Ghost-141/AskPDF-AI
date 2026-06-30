@@ -11,15 +11,19 @@ class Settings(BaseSettings):
     Central place for application configuration backed by Pydantic BaseSettings.
     """
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+    )
 
     base_dir: Path = Path(__file__).resolve().parents[2]
     data_dir: Path = base_dir / "data"
     upload_dir: Path = data_dir / "raw"
     vector_db_dir: Path = data_dir / "vector_db"
 
-    frontend_origin: str = Field(default="http://localhost:3000", alias="FRONTEND_ORIGIN")
-    groq_api_key: Optional[str] = Field(default=None, alias="GROQ_API_KEY")
+    frontend_origin: str = Field(
+        default="http://localhost:3000", alias="FRONTEND_ORIGIN"
+    )
+    groq_api_key: str = Field(default="", alias="GROQ_API_KEY")
     default_model: str = Field(default="openai/gpt-oss-120b", alias="GROQ_MODEL_NAME")
 
     def model_post_init(self, __context) -> None:

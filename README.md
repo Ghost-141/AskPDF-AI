@@ -79,6 +79,16 @@ For GPU acceleration, you need to install PyTorch with CUDA support. Make sure y
 
     **Note:** Using a version of PyTorch with CUDA support is essential for running the model on an NVIDIA GPU. If you do not have a compatible GPU, the embedding model will run on the CPU, which will be significantly slower while processing the pdf.
 
+### Document parsing (`unstructured`)
+
+File extraction uses [`unstructured`](https://docs.unstructured.io) to perform layout-aware PDF partitioning. This gives the retriever much cleaner chunks: heading-aware boundaries, typed metadata (`Title`, `NarrativeText`, `ListItem`, `Table`, …), and tables rendered as Markdown so the LLM and the frontend's `react-markdown` can both consume them without alignment loss.
+
+The default partitioning strategy is `"fast"` — pure-Python, no OCR, works in a stock install. If you want layout-aware table detection (and you've installed the OCR extras), set `FileProcessor(..., strategy="hi_res")` in `backend/api/files.py`. The `hi_res` strategy is slower at ingestion time but yields more accurate table extraction.
+
+If `unstructured` raises on a problematic file (rare, usually due to a missing OCR dependency or an exotic PDF), `backend/services/file_processor.py` automatically falls back to the previous `PyMuPDFLoader` / `TextLoader` path — you will see a `unstructured extraction failed ... falling back` log line.
+
+OCR for scanned PDFs is not enabled by default; install `unstructured_pytesseract` and switch to `strategy="hi_res"` if you need it.
+
 ### Configuration
 
 Create a `.env` file in the **root** of the project and add your keys:
@@ -96,9 +106,20 @@ Start the backend and frontend in separate terminals.
 
 ### Backend (FastAPI)
 
+Run via the uv-managed virtual environment (so the project's pinned
+`langchain`/`unstructured`/`uvicorn` versions are used, not whatever happens
+to be on `PATH` from another Python install):
+
 ```bash
-uvicorn backend.main:app --reload
+# from the repo root
+uv run --python 3.11 python -m uvicorn backend.main:app --reload
 ```
+
+> **Avoid `uv run rav run backend`** — `rav` is a third-party wrapper that
+> shells out to its own bundled `uvicorn` (often from a different Python
+> install), which will fail with `ModuleNotFoundError: No module named
+> 'langchain_core'` even when the project's venv has everything installed.
+> Use the `python -m uvicorn` form above; it always uses the venv's uvicorn.
 
 The API is available at `http://localhost:8000`.
 
