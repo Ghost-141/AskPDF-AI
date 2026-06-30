@@ -24,8 +24,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Ghost-141/PDF-QA-System.git
-    cd PDF-QA-System
+    git clone https://github.com/Ghost-141/AskPDF-AI.git
+    cd AskPDF-AI
     ```
 
 2.  **Create a virtual environment (recommended):**
@@ -44,8 +44,8 @@ These instructions will get you a copy of the project up and running on your loc
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/Ghost-141/PDF-QA-System.git
-    cd PDF-QA-System
+    git clone https://github.com/Ghost-141/AskPDF-AI.git
+    cd AskPDF-AI
     ```
 
 2.  **Create a Conda environment:**
